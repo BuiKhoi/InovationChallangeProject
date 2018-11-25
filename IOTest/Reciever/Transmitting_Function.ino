@@ -1,30 +1,35 @@
-RET_STATUS ReceiveMsg(uint8_t *pdatabuf, uint8_t *data_len)
-{
-
-  RET_STATUS STATUS = RET_SUCCESS;
+void ReceiveMsg() {
   uint8_t idx;
-
+  uint8_t pdatabuf[200];
   SwitchMode(MODE_0_NORMAL);
-  *data_len = softSerial.available();
+  int count = 0;
+  while (!ReadAUX() || !((StrCtn(pdatabuf, '<') && StrCtn(pdatabuf, '>')))) {
+    int lengths = softSerial.available();
 
-  if (*data_len > 0)
-  {
-//    Serial.print("ReceiveMsg: ");  Serial.print(*data_len);  Serial.println(" bytes.");
-
-    for(idx=0;idx<*data_len;idx++)
-      *(pdatabuf+idx) = softSerial.read();
-
-    for(idx=0;idx<*data_len;idx++)
+    if (lengths > 0)
     {
-      Serial.print((char)(0xFF & *(pdatabuf+idx)));    // print as an ASCII-encoded hexadecimal
+      for (idx = 0; idx < lengths; idx++) {
+        pdatabuf[count++] = softSerial.read();
+        if (pdatabuf[count-1] != '<') {
+          if (pdatabuf[count-1] == '>') {
+            Serial.println();
+          } else {
+            Serial.print((char)pdatabuf[count-1]);
+          }
+        }
+      }
     }
   }
-  else
-  {
-    STATUS = RET_NOT_IMPLEMENT;
-  }
+}
 
-  return STATUS;
+bool StrCtn(uint8_t* str, uint8_t key) {
+//  Serial.println(key);
+  for (int i = 0; i < strlen(str); i++) {
+    if (str[i] == key) {
+      return true;
+    }
+  }
+  return false;
 }
 
 RET_STATUS SendMessage(uint8_t ADDH, uint8_t ADDL, uint8_t *Mess)

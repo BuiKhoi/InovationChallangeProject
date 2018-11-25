@@ -17,6 +17,7 @@ void setup() {
 
   softSerial.begin(9600);
   Serial.begin(9600);
+  
   SetAddress(0x06, 0x05);
   SwitchMode(MODE_0_NORMAL);
   WaitAUX_H();
@@ -25,6 +26,6 @@ void setup() {
 
 void loop() {
   uint8_t DataBuff[100], data_len = 0;
-  ReceiveMsg(DataBuff, &data_len);
+  ReceiveMsg();
 }
 
