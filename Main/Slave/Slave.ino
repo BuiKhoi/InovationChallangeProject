@@ -11,10 +11,10 @@ bool NewMessage = false;
 int SysMode = 0;
 
 //Address
-#define MASTER_ADDH 0x02
-#define MASTER_ADDL 0x01
-#define MyAddH 0x08
-#define MyAddL 0x07
+#define MASTER_ADDH 0x08
+#define MASTER_ADDL 0x07
+#define MyAddH 0x02
+#define MyAddL 0x01
 
 //Encoder
 #define EncoderA 2
@@ -44,9 +44,7 @@ byte arrow[8] = {
 #define M0_PIN  A4
 #define M1_PIN  A5
 #define AUX_PIN A6
-#define SOFT_RX 9
-#define SOFT_TX 10
-SoftwareSerial LoraNode(SOFT_RX, SOFT_TX);
+SoftwareSerial LoraNode(10, 9);
 
 enum SystemMode {
   FREE = 0,
@@ -60,12 +58,12 @@ void setup() {
   Serial.begin(9600);
   //Lora init
   LoraNode.begin(9600);
-  pinMode(M0_PIN, OUTPUT);
-  pinMode(M1_PIN, OUTPUT);
-  pinMode(AUX_PIN, INPUT);
-  ShowError(WaitHighAUX());
-  SwitchMode(NORMAL);
-  SetAddress(MyAddH, MyAddL);
+  //  pinMode(M0_PIN, OUTPUT);
+  //  pinMode(M1_PIN, OUTPUT);
+  //  pinMode(AUX_PIN, INPUT);
+  //  ShowError(WaitHighAUX());
+  //  SwitchMode(NORMAL);
+  //  SetAddress(MyAddH, MyAddL);
 
   //RFID init
   SPI.begin();
@@ -80,20 +78,17 @@ void setup() {
   lcd.begin(20, 4);
   lcd.clear();
   lcd.createChar(1, arrow);
-
-
-  Serial.println("Slave started!");
 }
 
 void loop() {
   switch (SysMode) {
     case FREE: {
-      FreeMode();
-      break;
-    }
+        FreeMode();
+        break;
+      }
     case SHOW_DIRECTION: {
-      ShowDirection();
-      break;
-    }
+        ShowDirection();
+        break;
+      }
   }
 }

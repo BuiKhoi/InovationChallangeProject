@@ -16,7 +16,7 @@ void ShowInfo() {
 
 void ShowDirection() {
   if (RequestRoomDirection()) {
-    Serial.println("Waiting for respond");
+//    Serial.println("Waiting for respond");
     //    while (!NewMessage) {
     //      ReciveMessage();
     //    }
@@ -24,5 +24,6 @@ void ShowDirection() {
     ProcessDirection();
     delay(5000);
     SysMode = FREE;
+    RoomNumberPrinted = false;
   } else return;
 }

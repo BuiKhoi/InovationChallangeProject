@@ -10,9 +10,5 @@ void GetCardID() {
     CardID[2*i] = str_temp[0];
     CardID[2*i+1] = str_temp[1];
   }
-  for (int i=0; i<8; i++) {
-    Serial.print(CardID[i]);
-  }
-  Serial.println();
 }
 

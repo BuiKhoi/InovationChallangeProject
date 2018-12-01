@@ -1,10 +1,10 @@
 void ProcessDirection() {
   uint8_t temp[50];
   strcpy(temp, GetNextCommand());
-  for (int z = 0; z < strlen(temp); z++) {
-    Serial.print((char)temp[z]);
-  }
-  Serial.println();
+//  for (int z = 0; z < strlen(temp); z++) {
+//    Serial.print((char)temp[z]);
+//  }
+//  Serial.println();
   if (!strcmp(temp, "DIR")) {
     Route();
   } else if (!strcmp(temp, "HRE")) {
@@ -35,10 +35,6 @@ uint8_t* GetNextCommand() {
     j++;
   }
   StrBuff[i] = '.';
-  for (int i=0; i<strlen(StrBuff); i++) {
-    Serial.print((char)StrBuff[i]);
-  }
-  Serial.println();
   return rtr;
 }
 
@@ -47,10 +43,10 @@ void Route() {
   strcpy(des, GetNextCommand());
   uint8_t heading[40] = "Heading to: ";
   strcat(heading, des);
-  for (int i=0; i<strlen(heading); i++) {
-    Serial.print((char)heading[i]);
-  }
-  Serial.println();
+//  for (int i=0; i<strlen(heading); i++) {
+//    Serial.print((char)heading[i]);
+//  }
+//  Serial.println();
   lcd.clear();
   SmartPrint(heading, 0);
 
@@ -61,10 +57,10 @@ void Route() {
     strcat(dir, GetRoute(rut[i]));
     strcat(dir, " ");
   }
-  for (int i=0; i<strlen(dir); i++) {
-    Serial.print((char)dir[i]);
-  }
-  Serial.println();
+//  for (int i=0; i<strlen(dir); i++) {
+//    Serial.print((char)dir[i]);
+//  }
+//  Serial.println();
   SmartPrint(dir, 1);
 }
 

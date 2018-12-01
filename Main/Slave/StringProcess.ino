@@ -6,29 +6,29 @@ uint8_t GetChar(int index) {
 uint8_t* GetRoute(uint8_t chr) {
   switch (chr) {
     case 'H': {
-      return "Head";
-    }
+        return "Head";
+      }
     case 'L': {
-      return "left";
-    }
+        return "left";
+      }
     case 'R': {
-      return "right";
-    }
+        return "right";
+      }
     case 'T': {
-      return "to";
-    }
+        return "to";
+      }
     case 'E': {
-      return "elevator";
-    }
+        return "elevator";
+      }
     case 'S': {
-      return "stair";
-    }
+        return "stair";
+      }
     case 'D': {
-      return "destination";
-    }
+        return "destination";
+      }
     case 'Y': {
-      return "your";
-    }
+        return "your";
+      }
   }
 }
 

@@ -24,8 +24,8 @@ void setup() {
 }
 
 void loop() {
-  uint8_t AddH = 0x06;
-  uint8_t AddL = 0x05;
+  uint8_t AddH = 0x02;
+  uint8_t AddL = 0x01;
   uint8_t Mess[7] = "Hello!";
   SendMessage(AddH, AddL, Mess);
   delay(2000);

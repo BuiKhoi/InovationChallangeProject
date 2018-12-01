@@ -1,32 +1,29 @@
 /**
- * E32-TTL-100 Transceiver Interface
- *
- * @author Bob Chen (bob-0505@gotmail.com)
- * @date 1 November 2017
- * https://github.com/Bob0505/E32-TTL-100
- */
+   E32-TTL-100 Transceiver Interface
+
+   @author Bob Chen (bob-0505@gotmail.com)
+   @date 1 November 2017
+   https://github.com/Bob0505/E32-TTL-100
+*/
 #include <SoftwareSerial.h>
 
 #include "E32-TTL-100.h"
 
 /*
- need series a 4.7k Ohm resistor between .
- UNO/NANO(5V mode)                E32-TTL-100
-    *--------*                      *------*
+  need series a 4.7k Ohm resistor between .
+  UNO/NANO(5V mode)                E32-TTL-100
+     --------*                      *------
     | D7     | <------------------> | M0   |
     | D8     | <------------------> | M1   |
     | A0     | <------------------> | AUX  |
     | D10(Rx)| <---> 4.7k Ohm <---> | Tx   |
     | D11(Tx)| <---> 4.7k Ohm <---> | Rx   |
-    *--------*                      *------*
+     --------*                      *------
 */
-#define M0_PIN  A4
-#define M1_PIN  A5
-#define AUX_PIN A6
-#define SOFT_RX 9
-#define SOFT_TX 10
-
-SoftwareSerial softSerial(SOFT_RX, SOFT_TX);  // RX, TX
+#define M0_PIN  A1
+#define M1_PIN  A0
+#define AUX_PIN A2
+SoftwareSerial softSerial(11, 10);
 
 //=== AUX ===========================================+
 bool AUX_HL;
@@ -34,10 +31,10 @@ bool ReadAUX()
 {
   int val = analogRead(AUX_PIN);
 
-  if(val<50)
+  if (val < 50)
   {
     AUX_HL = LOW;
-  }else {
+  } else {
     AUX_HL = HIGH;
   }
 
@@ -52,16 +49,17 @@ RET_STATUS WaitAUX_H()
   uint8_t cnt = 0;
   uint8_t data_buf[100], data_len;
 
-  while((ReadAUX()==LOW) && (cnt++<TIME_OUT_CNT))
+  while ((ReadAUX() == LOW) && (cnt++ < TIME_OUT_CNT))
+  
   {
     Serial.print(".");
     delay(100);
   }
 
-  if(cnt==0)
+  if (cnt == 0)
   {
   }
-  else if(cnt>=TIME_OUT_CNT)
+  else if (cnt >= TIME_OUT_CNT)
   {
     STATUS = RET_TIMEOUT;
     Serial.println(" TimeOut");
@@ -79,7 +77,7 @@ bool chkModeSame(MODE_TYPE mode)
 {
   static MODE_TYPE pre_mode = MODE_INIT;
 
-  if(pre_mode == mode)
+  if (pre_mode == mode)
   {
     //Serial.print("SwitchMode: (no need to switch) ");  Serial.println(mode, HEX);
     return true;
@@ -94,7 +92,7 @@ bool chkModeSame(MODE_TYPE mode)
 
 void SwitchMode(MODE_TYPE mode)
 {
-  if(!chkModeSame(mode))
+  if (!chkModeSame(mode))
   {
     WaitAUX_H();
 
@@ -156,11 +154,11 @@ RET_STATUS Module_info(uint8_t* pReadbuf, uint8_t buf_len)
   //Serial.print("softSerial.available(): ");  Serial.print(Readcnt);  Serial.println(" bytes.");
   if (Readcnt == buf_len)
   {
-    for(idx=0;idx<buf_len;idx++)
+    for (idx = 0; idx < buf_len; idx++)
     {
-      *(pReadbuf+idx) = softSerial.read();
+      *(pReadbuf + idx) = softSerial.read();
       Serial.print(" 0x");
-      Serial.print(0xFF & *(pReadbuf+idx), HEX);    // print as an ASCII-encoded hexadecimal
+      Serial.print(0xFF & *(pReadbuf + idx), HEX);  // print as an ASCII-encoded hexadecimal
     } Serial.println("");
   }
   else
@@ -196,13 +194,13 @@ RET_STATUS Read_CFG(struct CFGstruct* pCFG)
 
   //3. Receive configure
   STATUS = Module_info((uint8_t *)pCFG, sizeof(CFGstruct));
-  if(STATUS == RET_SUCCESS)
+  if (STATUS == RET_SUCCESS)
   {
-  Serial.print("  HEAD:     ");  Serial.println(pCFG->HEAD, HEX);
-  Serial.print("  ADDH:     ");  Serial.println(pCFG->ADDH, HEX);
-  Serial.print("  ADDL:     ");  Serial.println(pCFG->ADDL, HEX);
+    Serial.print("  HEAD:     ");  Serial.println(pCFG->HEAD, HEX);
+    Serial.print("  ADDH:     ");  Serial.println(pCFG->ADDH, HEX);
+    Serial.print("  ADDL:     ");  Serial.println(pCFG->ADDL, HEX);
 
-  Serial.print("  CHAN:     ");  Serial.println(pCFG->CHAN, HEX);
+    Serial.print("  CHAN:     ");  Serial.println(pCFG->CHAN, HEX);
   }
 
   return STATUS;
@@ -220,7 +218,7 @@ RET_STATUS Read_module_version(struct MVerstruct* MVer)
 
   //3. Receive configure
   STATUS = Module_info((uint8_t *)MVer, sizeof(MVerstruct));
-  if(STATUS == RET_SUCCESS)
+  if (STATUS == RET_SUCCESS)
   {
     Serial.print("  HEAD:     0x");  Serial.println(MVer->HEAD, HEX);
     Serial.print("  Model:    0x");  Serial.println(MVer->Model, HEX);
@@ -287,7 +285,7 @@ RET_STATUS SettingModule(struct CFGstruct *pCFG)
   pCFG->ADDL = DEVICE_B_ADDR_L;
 #endif
 
-  pCFG->OPTION_bits.trsm_mode =TRSM_FP_MODE;
+  pCFG->OPTION_bits.trsm_mode = TRSM_FP_MODE;
   pCFG->OPTION_bits.tsmt_pwr = TSMT_PWR_10DB;
 
   STATUS = SleepModeCmd(W_CFG_PWR_DWN_SAVE, (void* )pCFG);
@@ -312,13 +310,13 @@ RET_STATUS ReceiveMsg(uint8_t *pdatabuf, uint8_t *data_len)
   {
     Serial.print("ReceiveMsg: ");  Serial.print(*data_len);  Serial.println(" bytes.");
 
-    for(idx=0;idx<*data_len;idx++)
-      *(pdatabuf+idx) = softSerial.read();
+    for (idx = 0; idx < *data_len; idx++)
+      *(pdatabuf + idx) = softSerial.read();
 
-    for(idx=0;idx<*data_len;idx++)
+    for (idx = 0; idx < *data_len; idx++)
     {
       Serial.print(" 0x");
-      Serial.print(0xFF & *(pdatabuf+idx), HEX);    // print as an ASCII-encoded hexadecimal
+      Serial.print(0xFF & *(pdatabuf + idx), HEX);  // print as an ASCII-encoded hexadecimal
     } Serial.println("");
   }
   else
@@ -329,18 +327,36 @@ RET_STATUS ReceiveMsg(uint8_t *pdatabuf, uint8_t *data_len)
   return STATUS;
 }
 
+void SetAddress(uint8_t AddH, uint8_t AddL) {
+  uint8_t SendBuff[6] = { 0xC0, AddH, AddL, 0x1A, 0x17, 0x04 };
+  SwitchMode(MODE_3_SLEEP);
+  int start = millis();
+  while (!ReadAUX()) {
+    if (millis() - start > 200) {
+      break;
+    }
+    delay(10);
+  }
+  softSerial.write(SendBuff, 6);
+  SwitchMode(MODE_0_NORMAL);
+  Serial.print("Set address to: ");
+  Serial.print(AddH, HEX);
+  Serial.print(" ");
+  Serial.println(AddL, HEX);
+}
+
 RET_STATUS SendMsg()
 {
   RET_STATUS STATUS = RET_SUCCESS;
 
   SwitchMode(MODE_0_NORMAL);
 
-  if(ReadAUX()!=HIGH)
+  if (ReadAUX() != HIGH)
   {
     return RET_NOT_IMPLEMENT;
   }
   delay(10);
-  if(ReadAUX()!=HIGH)
+  if (ReadAUX() != HIGH)
   {
     return RET_NOT_IMPLEMENT;
   }
@@ -357,21 +373,6 @@ RET_STATUS SendMsg()
   return STATUS;
 }
 
-RET_STATUS SetAddress(uint8_t ADDH, uint8_t ADDL) {
-  uint8_t SendBuff[6] = {0xC0, ADDH, ADDL, 0x1A, 0x17, 0x04};
-  SwitchMode(MODE_3_SLEEP);
-  int start = millis();
-  while (!ReadAUX()) {
-    if (millis()-start>200) {
-      return RET_TIMEOUT;
-      break;
-    }
-    delay(10);
-  }
-  softSerial.write(SendBuff, 6);
-  return RET_SUCCESS;
-}
-
 //The setup function is called once at startup of the sketch
 void setup()
 {
@@ -383,8 +384,8 @@ void setup()
   pinMode(M1_PIN, OUTPUT);
   pinMode(AUX_PIN, INPUT);
   pinMode(LED_BUILTIN, OUTPUT);
-
   softSerial.begin(9600);
+  SetAddress(0x08, 0x07);
   Serial.begin(9600);
 
 #ifdef Device_A
@@ -405,10 +406,9 @@ void setup()
   WaitAUX_H();
   delay(10);
 
-  Serial.println(SetAddress(0x02, 0x01));
-  
-  if(STATUS == RET_SUCCESS)
+  if (STATUS == RET_SUCCESS)
     Serial.println("Setup init OK!!");
+  SetAddress(0x08, 0x07);
 }
 
 void blinkLED()
@@ -423,18 +423,18 @@ void blinkLED()
 void loop()
 {
   uint8_t data_buf[100], data_len;
-
-#ifdef Device_A
-  if(ReceiveMsg(data_buf, &data_len)==RET_SUCCESS)
-  {
-    blinkLED();
-  }
-#else
-  if(SendMsg()==RET_SUCCESS)
-  {
-    blinkLED();
-  }
-#endif
-
-  delay(random(400, 600));
+  ReceiveMsg(data_buf, &data_len);
+  //#ifdef Device_A
+  //  if(ReceiveMsg(data_buf, &data_len)==RET_SUCCESS)
+  //  {
+  //    blinkLED();
+  //  }
+  //#else
+  //  if(SendMsg()==RET_SUCCESS)
+  //  {
+  //    blinkLED();
+  //  }
+  //#endif
+  //
+  //  delay(random(400, 600));
 }

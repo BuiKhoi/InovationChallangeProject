@@ -111,8 +111,12 @@ void SendMessage(uint8_t AddH, uint8_t AddL, uint8_t *Mess) {
     SendBuff[i] = Mess[i - 3];
   }
   LoraNode.write(SendBuff, lengths);
+  Serial.print("Sending to ");
+  Serial.print(AddH);
+  Serial.print(" ");
+  Serial.println(AddL);
   Serial.print("Sent message: ");
-  for (int i=0; i<lengths-3; i++) {
+  for (int i = 0; i < lengths - 3; i++) {
     Serial.print(char(Mess[i]));
   } Serial.println();
   return STATUS;
@@ -128,13 +132,12 @@ void ReciveMessage() {
     if (length > 0) {
       for (int i = 0; i < length; i++) {
         uint8_t key = LoraNode.read();
-        if (key!='<'&&key!='>') {
-          StrBuff[count++] = key;
-        }
+        StrBuff[count++] = key;
       }
     }
+
+    NewMessage = true;
   }
-  NewMessage = true;
 }
 
 bool StrCtn(uint8_t* str, uint8_t key) {

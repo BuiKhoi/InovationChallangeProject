@@ -1,13 +1,11 @@
 #include <SoftwareSerial.h>
 #include "E32-TTL-100.h"
 
-#define M0_PIN  A4
-#define M1_PIN  A5
-#define AUX_PIN A6
-#define SOFT_RX 10
-#define SOFT_TX 9
+#define M0_PIN  A1
+#define M1_PIN  A0
+#define AUX_PIN A2
 
-SoftwareSerial softSerial(SOFT_RX, SOFT_TX);
+SoftwareSerial softSerial(11, 10); // RX, TX
 
 void setup() {
   pinMode(M0_PIN, OUTPUT);
@@ -18,7 +16,7 @@ void setup() {
   softSerial.begin(9600);
   Serial.begin(9600);
   
-  SetAddress(0x06, 0x05);
+  Serial.println(SetAddress(0x08, 0x07));
   SwitchMode(MODE_0_NORMAL);
   WaitAUX_H();
   delay(10);
