@@ -22,15 +22,21 @@ TRANS_STATUS WaitHighAUX() {
   }
 
   if (millis() - start > 2000) {
+    Serial.println("Transmission time out");
     return TRANS_TIMEOUT;
   }
 
+  Serial.println("Transmission success");
   return TRANS_SUCCESS;
 }
 
 void SwitchMode(WORK_MODE mode) {
   static WORK_MODE prev_mode = INIT;
   if (mode != prev_mode) {
+    Serial.print("Switching from mode: ");
+    Serial.print(prev_mode);
+    Serial.print(" to mode: ");
+    Serial.println(mode);
     switch (mode) {
       case NORMAL: {
           digitalWrite(M0_PIN, LOW);
@@ -55,6 +61,7 @@ void SwitchMode(WORK_MODE mode) {
     }
   }
   WaitHighAUX();
+  Serial.println("Done switching");
 }
 
 void CleanBuffer() {
@@ -77,33 +84,14 @@ TRANS_STATUS SetAddress(uint8_t AddH, uint8_t AddL) {
   }
   LoraNode.write(SendBuff, 6);
   SwitchMode(NORMAL);
+  Serial.print("Set address to: ");
+  Serial.print(AddH, HEX);
+  Serial.print(" ");
+  Serial.println(AddL, HEX);
   return TRANS_SUCCESS;
 }
 
-TRANS_STATUS SendMessage(Node node, uint8_t* Mess) {
-  //  TRANS_STATUS STATUS = TRANS_SUCCESS;
-  //  SwitchMode(NORMAL);
-  //  if (ReadAUX() != HIGH)
-  //  {
-  //    return TRANS_NOT_IMPLEMENT;
-  //  }
-  //  delay(10);
-  //  if (ReadAUX() != HIGH)
-  //  {
-  //    return TRANS_NOT_IMPLEMENT;
-  //  }
-  //  uint8_t addr[2] = GetAddress(node);
-  //  int lengths = 3 + strlen(Mess);
-  //  //Send format : ADDH ADDL CHAN DATA_0 DATA_1 DATA_2 ...
-  //  uint8_t SendBuff[lengths] = { addr[0], addr[1], 0x17 };
-  //  for (int i = 3; i < lengths; i++) {
-  //    SendBuff[i] = Mess[i - 3];
-  //  }
-  //  LoraNode.write(SendBuff, lengths);
-  //  return STATUS;
-}
-
-void SendMessage(uint8_t AddH, uint8_t AddL, uint8_t *Mess) {
+TRANS_STATUS SendMessage(uint8_t AddH, uint8_t AddL, uint8_t *Mess) {
   Serial.println("Starting send message");
   TRANS_STATUS STATUS = TRANS_SUCCESS;
   SwitchMode(NORMAL);
@@ -116,37 +104,41 @@ void SendMessage(uint8_t AddH, uint8_t AddL, uint8_t *Mess) {
   {
     return TRANS_NOT_IMPLEMENT;
   }
-  int lengths = 3 + strlen(Mess);
+  int lengths = 3 + strlen((char*)Mess);
   //Send format : ADDH ADDL CHAN DATA_0 DATA_1 DATA_2 ...
   uint8_t SendBuff[lengths] = { AddH, AddL, 0x17 };
   for (int i = 3; i < lengths; i++) {
     SendBuff[i] = Mess[i - 3];
   }
   LoraNode.write(SendBuff, lengths);
+  Serial.print("Sent message: ");
+  for (int i=0; i<lengths-3; i++) {
+    Serial.print(Mess[i]);
+  } Serial.println();
   return STATUS;
 }
 
 void ReciveMessage() {
-  //  detachInterrupt(Aux_interrupt);
-  uint8_t idx;
-
   SwitchMode(NORMAL);
   int count = 0;
+  strcpy(StrBuff, "");
   while (!ReadAUX() && (StrCtn(StrBuff, '<') && StrCtn(StrBuff, '>'))) {
     int length = LoraNode.available();
 
-    if (length > 0)
-    {
-      for (idx = 0; idx < length; idx++)
-        StrBuff[count++] = LoraNode.read();
-        Serial.println(StrBuff[count-1]);
+    if (length > 0) {
+      for (int i = 0; i < length; i++) {
+        uint8_t key = LoraNode.read();
+        if (key!='<'&&key!='>') {
+          StrBuff[count++] = key;
+        }
+      }
     }
-    NewMessage = true;
   }
+  NewMessage = true;
 }
 
 bool StrCtn(uint8_t* str, uint8_t key) {
-  for (int i = 0; i < strlen(str); i++) {
+  for (int i = 0; i < strlen((char*)str); i++) {
     if (str[i] == key) {
       return true;
     }
@@ -198,41 +190,3 @@ void ShowError(TRANS_STATUS status) {
       }
   }
 }
-
-uint8_t* GetAddress(Node node) {
-  uint8_t rtr[2];
-  if (node.AddH != 0x00 && node.AddL != 0x00) {
-    rtr[0] = node.AddH;
-    rtr[1] = node.AddL;
-  }
-  else {
-    char path[20];
-    strcpy(path, "Node/");
-    strcat(path, node.Id);
-    strcat(path, ".txt");
-    File dataFile = SD.open(path);
-
-    if (dataFile) {
-      uint8_t Buff[20];
-      int count = 0;
-      while (dataFile.available()) {
-        Buff[count++] = dataFile.read();
-      }
-      dataFile.close();
-
-      uint8_t temp[3];
-      temp[0] = Buff[0];
-      temp[1] = Buff[1];
-      rtr[0] = GetHex(temp);
-
-      temp[0] = Buff[3];
-      temp[1] = Buff[4];
-      rtr[1] = GetHex(temp);
-    }
-    else {
-      Serial.println("Data file failed to open");
-    }
-  }
-  return rtr;
-}
-

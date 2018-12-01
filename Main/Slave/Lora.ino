@@ -21,16 +21,22 @@ TRANS_STATUS WaitHighAUX() {
     delay(50);
   }
 
-  if (millis() - start < 2000) {
+  if (millis() - start > 2000) {
+    Serial.println("Transmission time out");
     return TRANS_TIMEOUT;
   }
 
+  Serial.println("Transmission success");
   return TRANS_SUCCESS;
 }
 
 void SwitchMode(WORK_MODE mode) {
   static WORK_MODE prev_mode = INIT;
   if (mode != prev_mode) {
+    Serial.print("Switching from mode: ");
+    Serial.print(prev_mode);
+    Serial.print(" to mode: ");
+    Serial.println(mode);
     switch (mode) {
       case NORMAL: {
           digitalWrite(M0_PIN, LOW);
@@ -55,6 +61,7 @@ void SwitchMode(WORK_MODE mode) {
     }
   }
   WaitHighAUX();
+  Serial.println("Done switching");
 }
 
 void CleanBuffer() {
@@ -77,6 +84,10 @@ TRANS_STATUS SetAddress(uint8_t AddH, uint8_t AddL) {
   }
   LoraNode.write(SendBuff, 6);
   SwitchMode(NORMAL);
+  Serial.print("Set address to: ");
+  Serial.print(AddH, HEX);
+  Serial.print(" ");
+  Serial.println(AddL, HEX);
   return TRANS_SUCCESS;
 }
 
@@ -100,16 +111,14 @@ void SendMessage(uint8_t AddH, uint8_t AddL, uint8_t *Mess) {
     SendBuff[i] = Mess[i - 3];
   }
   LoraNode.write(SendBuff, lengths);
+  Serial.print("Sent message: ");
+  for (int i=0; i<lengths-3; i++) {
+    Serial.print(char(Mess[i]));
+  } Serial.println();
   return STATUS;
 }
 
-void BeginMessageListener() {
-  attachInterrupt(Aux_interrupt, ReciveMessage, FALLING);
-}
-
 void ReciveMessage() {
-  detachInterrupt(Aux_interrupt);
-
   SwitchMode(NORMAL);
   int count = 0;
   strcpy(StrBuff, "");
@@ -125,7 +134,6 @@ void ReciveMessage() {
       }
     }
   }
-  BeginMessageListener();
   NewMessage = true;
 }
 

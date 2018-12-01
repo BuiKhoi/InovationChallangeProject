@@ -3,14 +3,13 @@
 #include <SD.h>
 #include <E32_TTL_100_Lora.h>
 
-#define M0_PIN  7
-#define M1_PIN  8
-#define AUX_PIN A0
+#define M0_PIN  A4
+#define M1_PIN  A5
+#define AUX_PIN A6
 #define SOFT_RX 10
-#define SOFT_TX 11
+#define SOFT_TX 9
 
 #define SDChipSelect 5
-#define Aux_interrupt 2
 
 uint8_t StrBuff[200] = "";
 bool NewMessage = false;
@@ -31,10 +30,22 @@ void setup() {
 //  }
   ShowError(WaitHighAUX());
   SwitchMode(NORMAL);
+  ShowError(SetAddress(0x06, 0x05));
   Serial.println("System started!");
 }
 
 void loop() {
-  SendMessage(0x06, 0x05, "<Bui Quoc Khoi dep trai cute de thuong ahihi>");
-  delay(1000);
+//  SendMessage(0x06, 0x05, "<Bui Quoc Khoi dep trai cute de thuong ahihi>");
+//  ReciveMessage();
+//  if (NewMessage) {
+//    Serial.println("New message");
+//    NewMessage = false;
+//    for (int i=0; i<strlen(StrBuff); i++) {
+//      Serial.print(StrBuff[i]);
+//    }
+//    Serial.println();
+//  }
+  if (!ReadAUX()) {
+    Serial.println("AUX LOW");
+  }
 }

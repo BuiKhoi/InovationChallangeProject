@@ -1,11 +1,11 @@
 #include <SoftwareSerial.h>
 #include "E32-TTL-100.h"
 
-#define M0_PIN  7
-#define M1_PIN  8
-#define AUX_PIN A0
-#define SOFT_RX 10
-#define SOFT_TX 11
+#define M0_PIN  A4
+#define M1_PIN  A5
+#define AUX_PIN A6
+#define SOFT_RX 9
+#define SOFT_TX 10
 
 SoftwareSerial softSerial(SOFT_RX, SOFT_TX);
 

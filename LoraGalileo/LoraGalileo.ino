@@ -5,7 +5,7 @@
  * @date 1 November 2017
  * https://github.com/Bob0505/E32-TTL-100
  */
-#include <SoftwareSerial.h>
+#include <SoftwareSerial_Class.h>
 
 #include "E32-TTL-100.h"
 
@@ -22,11 +22,9 @@
 */
 #define M0_PIN  A4
 #define M1_PIN  A5
-#define AUX_PIN A6
-#define SOFT_RX 9
-#define SOFT_TX 10
+#define AUX_PIN A0
 
-SoftwareSerial softSerial(SOFT_RX, SOFT_TX);  // RX, TX
+SoftwareSerial softSerial(2, 3); // RX, TX
 
 //=== AUX ===========================================+
 bool AUX_HL;

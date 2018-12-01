@@ -1,22 +1,13 @@
-#define EncoderA 2
-#define EncoderB A1
-#define EncoderButton A0
-
-int position = 0;
-
-void setup() {
-  Serial.begin(9600);
-  pinMode(EncoderA, INPUT);
-  pinMode(EncoderB, INPUT);
-  pinMode(EncoderButton, INPUT);
-}
-
-void loop() {
-  static int number = 0;
-  int temp = GetControl();
-  if (temp != -1) {
-    number+=temp;
-    lcd.print(number);
+void ListenForKnob() {
+  static bool prev_A = true;
+  bool temp = !digitalRead(EncoderA);
+  if (temp && prev_A) {
+    if (digitalRead(EncoderB)) {
+      position++;
+    } else position--;
+    prev_A = false;
+  } else if (!temp) {
+    prev_A = true;
   }
 }
 
@@ -33,15 +24,13 @@ int GetControl() {
   }
 
   static int prev_but = -1;
-  static int last_press = millis();
+  static unsigned long long int last_press = millis();
   if (millis() - last_press > 100) {
     last_press = millis();
     if (!digitalRead(EncoderButton)) {
-      //    Serial.println("Press");
       if (prev_but == -1)  {
-        int start = millis();
         while (!digitalRead(EncoderButton)) {
-          if (millis() - start > 500) {
+          if (millis() - last_press > 700) {
             if (prev_but != 3) {
               prev_but = 3;
               return 3;
