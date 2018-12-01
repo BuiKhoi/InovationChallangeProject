@@ -1,4 +1,5 @@
 void PrintRoomNumber() {
+  lcd.clear();
   int length = strlen(myId);
   int pos = 20 - length;
   pos /= 2;
@@ -8,21 +9,21 @@ void PrintRoomNumber() {
   }
 }
 
-void SmartPrint(uint8_t* str) {
+void SmartPrint(uint8_t* str, int row) {
   int lengths = strlen(str);
   for (int i=0; i<80; i++) {
     if (i==0) {
-      lcd.setCursor(0, 0);
+      lcd.setCursor(0, row);
     } else if (i==20) {
-      lcd.setCursor(1, 0);
+      lcd.setCursor(0, row+1);
     } else if (i==40) {
-      lcd.setCursor(2, 0);
+      lcd.setCursor(0, row+2);
     } else if (i==60) {
-      lcd.setCursor(3, 0);
+      lcd.setCursor(0, row+3);
     }
     
     if (i<lengths) {
-      lcd.print(str[i]);
+      lcd.print((char)str[i]);
     } else break;
   }
 }

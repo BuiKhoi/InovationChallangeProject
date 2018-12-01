@@ -9,6 +9,8 @@ bool RequestRoomDirection() {
   
   SendMessage(MASTER_ADDH, MASTER_ADDL, request);
   NewMessage = false;
+  lcd.setCursor(0, 2);
+  lcd.print("Requesting data");
   return true;
 }
 
