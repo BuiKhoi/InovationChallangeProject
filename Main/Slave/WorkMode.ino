@@ -16,14 +16,21 @@ void ShowInfo() {
 
 void ShowDirection() {
   if (RequestRoomDirection()) {
-//    Serial.println("Waiting for respond");
-    //    while (!NewMessage) {
-    //      ReciveMessage();
-    //    }
-    strcpy(StrBuff, "<DIR#607#HLTYD>");
-    ProcessDirection();
-    delay(5000);
-    SysMode = FREE;
-    RoomNumberPrinted = false;
+    WaitSerial();
   } else return;
 }
+
+void WaitSerial() {
+  int i = 0;
+  strcpy(StrBuff, "");
+  Serial.flush();
+  while (!Serial.available()) {};
+  while (Serial.available()) {
+    StrBuff[i++] = Serial.read();
+  }
+  ProcessDirection();
+  delay(5000);
+  SysMode = FREE;
+  RoomNumberPrinted = false;
+}
+
