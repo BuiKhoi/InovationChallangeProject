@@ -7,8 +7,8 @@ const char myId[5] = "405";
 int SysMode = 0;
 
 //RFID + 11 12 13 - Verified
-#define SS_PIN A2
-#define RST_PIN A3
+#define SS_PIN A3
+#define RST_PIN A2
 MFRC522 mfrc522(SS_PIN, RST_PIN);
 char CardID[10];
 
@@ -221,12 +221,14 @@ void ShowDirection() {
 void WaitSerial() {
   int i = 0;
   strcpy(StrBuff, "");
+  int start = millis();
   while (true) {
     if (Serial.available()) {
       int temp;
       while ((temp=Serial.read())!='>') {
         Serial.print((char)temp);
         strcat(StrBuff, (char)temp);
+        delay(3);
       }
       WaitMessage = false;
       break;
